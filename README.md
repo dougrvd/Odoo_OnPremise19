@@ -1,22 +1,27 @@
 # Installing Odoo 19.0 with one command (Supports multiple Odoo instances on one server).
 
+> Based on [minhng92/odoo-19-docker-compose](https://github.com/minhng92/odoo-19-docker-compose) (MIT, © 2025 Minh Nguyen).
+> Maintained here by Delta Aplicación with our own defaults; see [LICENSE](LICENSE).
+
 ## Quick Installation
 
-Install [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) yourself, then run the following to set up first Odoo instance @ `localhost:10019` (default master password: `minhng.info`):
+Install [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) yourself, then run the following to set up first Odoo instance @ `localhost:10019`. The installer generates a random master password and a random database password, and prints both when it finishes:
 
 ``` bash
-curl -s https://raw.githubusercontent.com/minhng92/odoo-19-docker-compose/master/run.sh | bash -s odoo-one 10019 20019
+curl -s https://raw.githubusercontent.com/dougrvd/Odoo_OnPremise19/main/run.sh | bash -s -- --destination odoo-one --port 10019 --chat 20019
 ```
-and/or run the following to set up another Odoo instance @ `localhost:11019` (default master password: `minhng.info`):
+and/or run the following to set up another Odoo instance @ `localhost:11019`:
 
 ``` bash
-curl -s https://raw.githubusercontent.com/minhng92/odoo-19-docker-compose/master/run.sh | bash -s odoo-two 11019 21019
+curl -s https://raw.githubusercontent.com/dougrvd/Odoo_OnPremise19/main/run.sh | bash -s -- --destination odoo-two --port 11019 --chat 21019
 ```
 
-Some arguments:
-* First argument (**odoo-one**): Odoo deploy folder
-* Second argument (**10019**): Odoo port
-* Third argument (**20019**): live chat port
+Arguments:
+* `--destination` (**odoo-one**): Odoo deploy folder
+* `--port` (**10019**): Odoo port
+* `--chat` (**20019**): live chat port
+* `--password` (optional): master password. If omitted, a random one is generated.
+* `--db-password` (optional): PostgreSQL password. If omitted, a random one is generated.
 
 If `curl` is not found, install it:
 
@@ -79,11 +84,24 @@ $ sudo sysctl -p    # apply new config immediately
 
 The **addons/** folder contains custom addons. Just put your custom addons if you have any.
 
+## Image versions
+
+`docker-compose.yml` pins the exact images instead of the floating `odoo:19` / `postgres:18` tags:
+
+| Service | Image | Version |
+|---|---|---|
+| Odoo | `odoo:19.0-20251208` | Odoo Server 19.0-20251208 |
+| PostgreSQL | `postgres:18.1` | PostgreSQL 18.1 (Debian 18.1-1.pgdg13+2) |
+
+A moving tag means two installs made a month apart can ship different binaries, and recreating a container can bump the version without warning. These are the same images our `xpression` instance runs, so the whole fleet stays identical.
+
+To move to a newer build, change the tag here, deploy it on a test instance first, and only then roll it out.
+
 ## Odoo configuration & log
 
 * To change Odoo configuration, edit file: **etc/odoo.conf**.
 * Log file: **etc/odoo-server.log**
-* Default database password (**admin_passwd**) is `minhng.info`, please change it @ [etc/odoo.conf#L75](/etc/odoo.conf#L75)
+* The master password (**admin_passwd**) shipped in [etc/odoo.conf#L75](/etc/odoo.conf#L75) is the placeholder `CAMBIAR_ESTA_CLAVE`, not a usable password. `run.sh` replaces it with a random one at install time; if you deploy by hand with `docker compose`, set it yourself before exposing the instance — that password allows creating, dropping and restoring databases.
 
 ## Odoo container management
 
@@ -150,8 +168,3 @@ server {
 <img src="screenshots/odoo-19-product-form.jpg" width="100%">
 </p>
 
-## ☕ Buy Me a Coffee
-
-If you find this project helpful, consider buying me a coffee to support my work!
-
-<a href="https://buymeacoffee.com/minhng.info" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
