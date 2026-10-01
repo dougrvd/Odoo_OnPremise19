@@ -84,6 +84,19 @@ $ sudo sysctl -p    # apply new config immediately
 
 The **addons/** folder contains custom addons. Just put your custom addons if you have any.
 
+## Image versions
+
+`docker-compose.yml` pins the exact images instead of the floating `odoo:19` / `postgres:18` tags:
+
+| Service | Image | Version |
+|---|---|---|
+| Odoo | `odoo:19.0-20251208` | Odoo Server 19.0-20251208 |
+| PostgreSQL | `postgres:18.1` | PostgreSQL 18.1 (Debian 18.1-1.pgdg13+2) |
+
+A moving tag means two installs made a month apart can ship different binaries, and recreating a container can bump the version without warning. These are the same images our `xpression` instance runs, so the whole fleet stays identical.
+
+To move to a newer build, change the tag here, deploy it on a test instance first, and only then roll it out.
+
 ## Odoo configuration & log
 
 * To change Odoo configuration, edit file: **etc/odoo.conf**.

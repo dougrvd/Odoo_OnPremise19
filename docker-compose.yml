@@ -1,6 +1,14 @@
+# Versiones fijas a proposito. `postgres:18` y `odoo:19` son etiquetas moviles:
+# dos instalaciones hechas con un mes de diferencia traen binarios distintos, y
+# recrear un contenedor puede subir de version sin avisar. Estas son las mismas
+# que corre la instancia xpression, para que toda la flota sea igual.
+#   postgres:18.1          sha256:0033c194dc640cc4dcc62ef7c3117e5791365cca5fc1a2998e5c1693254784bc
+#   odoo:19.0-20251208     sha256:4d344f40154dd0627b7078c3dcb40cf1db7c0944473c1898eb63492659b398ef
+# Para subir de version: cambiar la etiqueta aqui, levantar en una instancia de
+# prueba y recien entonces replicar.
 services:
   db:
-    image: postgres:18
+    image: postgres:18.1
     user: root
     environment:
       - POSTGRES_USER=odoo
@@ -11,7 +19,7 @@ services:
         - ./postgresql:/var/lib/postgresql/18/docker      # Important Change: the PGDATA environment variable of the image was changed to be version specific in PostgreSQL 18 and above⁠
 
   odoo19:
-    image: odoo:19
+    image: odoo:19.0-20251208
     user: root
     depends_on:
       - db
